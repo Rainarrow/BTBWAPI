@@ -15,8 +15,12 @@ public:
 
 	void			Update();
 
+	Position		CalcCenterPosition() const; //Returns the average position of the group
+	bool			IsPositionWalkable(const Position& pos) const;
+
 private:
 	Unit			m_unit;
+	vector<Unit>	m_units;
 	Behavior *		m_root;
 	Blackboard *	m_globalBlackboard;
 	Blackboard *	m_localBlackboard;

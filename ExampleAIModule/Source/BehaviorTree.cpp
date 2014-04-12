@@ -283,6 +283,37 @@ BH_STATUS MoveTo::Update(float deltaTime)
 	return BH_RUNNING;
 }
 
+//////////////////////////////
+// ATTACK BEHAVIOR
+//////////////////////////////
+
+void Attack::OnInitialize()
+{
+	m_target = s_blackboard->GetTarget();
+}
+
+BH_STATUS Attack::Update(float deltaTime)
+{
+	Unit owner = s_blackboard->GetUnit("owner");
+
+	UnitCommand currentCmd(owner->getLastCommand());
+
+	if (currentCmd.getType() == UnitCommandTypes::Attack_Unit && currentCmd.getTarget() == m_target)
+		return BH_RUNNING;
+
+	if (owner->isAttackFrame()) // Unit is in Attack animation
+		return BH_RUNNING;
+
+	//Unit is not attacking its designated target, make it do so
+
+	owner->attack(m_target);
+	return BH_SUCCESS;
+
+	//Does this ever fail?
+
+	//@TODO: DebugDraw
+}
+
 void Delay::OnInitialize()
 {
 	m_delayLeft = 3.0f;

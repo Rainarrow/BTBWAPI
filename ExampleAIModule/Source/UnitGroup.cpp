@@ -3,6 +3,8 @@
 #include "Blackboard.h"
 #include <assert.h>
 
+using namespace BWAPI;
+
 UnitGroup::UnitGroup(Unit unit, Behavior * root, Blackboard * globalBlackboard) :
 	m_unit(unit),
 	m_root(root),
@@ -27,3 +29,19 @@ void UnitGroup::Update()
 		m_root->Tick(0.067f);
 	}
 }
+
+Position UnitGroup::CalcCenterPosition() const
+{
+	assert(!m_units.empty());
+
+	Position result(0, 0);
+
+	for (const auto u : m_units)
+	{
+		result += u->getPosition();
+	}
+
+	result.x /= m_units.size();
+	result.y /= m_units.size();
+
+	return result;

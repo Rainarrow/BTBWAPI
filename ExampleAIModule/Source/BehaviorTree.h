@@ -182,6 +182,17 @@ private:
 	Position				m_pos;
 };
 
+class Attack : public Behavior
+{
+public:
+
+	virtual void			OnInitialize();
+	virtual BH_STATUS		Update(float deltaTime);
+
+private:
+	Unit					m_target;
+};
+
 class Delay : public Behavior
 {
 public:
