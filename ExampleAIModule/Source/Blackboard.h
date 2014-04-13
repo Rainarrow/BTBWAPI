@@ -26,8 +26,6 @@ public:
 	Unit		GetUnit(string const & name);
 	Position	GetPosition(string const & name);
 
-	Unit		GetTarget() const;
-
 private:
 	Unit		m_unit;
 	Position	m_pos;

@@ -264,8 +264,8 @@ void MoveTo::OnInitialize()
 {
 	Unit owner = s_blackboard->GetUnit("owner");
 	m_pos = owner->getPosition();
-	m_pos.x += 200;
-	m_pos.y += 100;
+	m_pos.x -= 200;
+	//m_pos.y += 100;
 }
 
 BH_STATUS MoveTo::Update(float deltaTime)
@@ -289,11 +289,14 @@ BH_STATUS MoveTo::Update(float deltaTime)
 
 void Attack::OnInitialize()
 {
-	m_target = s_blackboard->GetTarget();
+	m_target = s_blackboard->GetUnit("target");
 }
 
 BH_STATUS Attack::Update(float deltaTime)
 {
+	if(!m_target->exists())
+		return BH_FAILURE;
+
 	Unit owner = s_blackboard->GetUnit("owner");
 
 	UnitCommand currentCmd(owner->getLastCommand());
