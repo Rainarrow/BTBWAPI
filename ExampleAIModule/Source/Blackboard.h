@@ -5,6 +5,15 @@
 using namespace std;
 using namespace BWAPI;
 
+
+struct Target
+{
+	Unit unit;
+	double distance; //Distance from center of the group
+	int underAtkOf;  //
+	bool isHighPriority;
+};
+
 class Blackboard
 {
 public:
@@ -22,5 +31,5 @@ public:
 private:
 	Unit		m_unit;
 	Position	m_pos;
-	vector<Unit>	m_targets; //Tentactive
+	vector<Target> m_targets;
 };
