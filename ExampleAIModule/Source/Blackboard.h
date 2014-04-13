@@ -10,7 +10,8 @@ struct Target
 {
 	Unit unit;
 	double distance; //Distance from center of the group
-	int underAtkOf;  //
+	int underAtkOfMelee;
+	int underAtkOfRanged;
 	bool isHighPriority;
 };
 
@@ -27,6 +28,7 @@ public:
 	Position	GetPosition(string const & name);
 
 	Unit		GetTarget() const;
+	Unit		FindBestTargetForDragoon() const;
 
 private:
 	Unit		m_unit;

@@ -45,5 +45,4 @@ Position UnitGroup::CalcCenterPosition() const
 	result.y /= m_units.size();
 
 	return result;
-
 }
