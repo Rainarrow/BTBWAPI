@@ -274,6 +274,18 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
 	Broodwar->sendText("onUnitCreate %s!", unit->getType().getName().c_str());
 	if(unit->getPlayer() == Broodwar->self())
 	{
+		/*
+		BTBuilder().
+			AddSequence()
+				.AddAction(new MoveTo())
+				.AddAction(new Delay())
+				.AddSequence()
+					.AddAction(new Delay())
+				.End()
+			.End()
+		.End();
+		*/
+
 		Behavior * root = new Sequence();
 		root->AddChild(new MoveTo());
 		root->AddChild(new Delay());

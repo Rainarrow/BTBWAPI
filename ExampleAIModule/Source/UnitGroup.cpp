@@ -6,8 +6,9 @@
 UnitGroup::UnitGroup(Behavior * root, Blackboard * globalBlackboard) :
 	m_root(root),
 	m_globalBlackboard(globalBlackboard),
-	m_localBlackboard(new Blackboard())
+	m_localBlackboard(NULL)
 {
+	m_localBlackboard = new Blackboard(m_globalBlackboard);
 	assert(m_root);
 }
 

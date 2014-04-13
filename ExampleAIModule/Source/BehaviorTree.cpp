@@ -262,7 +262,16 @@ BH_STATUS ActiveSelector::Update(float deltaTime)
 
 void MoveTo::OnInitialize()
 {
-	Unit owner = s_blackboard->GetUnit("owner");
+	Unit owner;
+	bool result = s_blackboard->GetUnit("owner", owner);
+	assert(result);
+
+	int attack = 0;
+	s_blackboard->GetInt("moveattack", attack);
+	m_moveAttack = attack != 0;
+
+	result = s_blackboard->GetPosition("moveto", m_pos);
+	//assert(result);
 	m_pos = owner->getPosition();
 	m_pos.x -= 200;
 	//m_pos.y += 100;
@@ -270,16 +279,24 @@ void MoveTo::OnInitialize()
 
 BH_STATUS MoveTo::Update(float deltaTime)
 {
-	Unit owner = s_blackboard->GetUnit("owner");
+	Unit owner;
+	if(!s_blackboard->GetUnit("owner", owner))
+		return BH_FAILURE;
+
 	if(owner->isMoving())
 		return BH_RUNNING;
+
 	Position pos = owner->getPosition();
 	if(pos.getApproxDistance(m_pos) < 2.0f)
 		return BH_SUCCESS;
 	if(GetStatus() == BH_RUNNING)
 		return BH_FAILURE;
 
-	owner->attack(m_pos);
+	if(!m_moveAttack)
+		owner->move(m_pos);
+	else
+		owner->attack(m_pos);
+
 	return BH_RUNNING;
 }
 
@@ -289,7 +306,8 @@ BH_STATUS MoveTo::Update(float deltaTime)
 
 void Attack::OnInitialize()
 {
-	m_target = s_blackboard->GetUnit("target");
+	bool result = s_blackboard->GetUnit("target", m_target);
+	assert(result);
 }
 
 BH_STATUS Attack::Update(float deltaTime)
@@ -297,7 +315,9 @@ BH_STATUS Attack::Update(float deltaTime)
 	if(!m_target->exists())
 		return BH_FAILURE;
 
-	Unit owner = s_blackboard->GetUnit("owner");
+	Unit owner;
+	if(!s_blackboard->GetUnit("owner", owner))
+		return BH_FAILURE;
 
 	UnitCommand currentCmd(owner->getLastCommand());
 
