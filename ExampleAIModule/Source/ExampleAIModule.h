@@ -32,6 +32,9 @@ public:
   // Everything below this line is safe to modify.
 
 private:
+
+	void					CreateUnitGroups();
+
 	Behavior *				m_tacticalBehavior;
 	Blackboard *			m_blackboard;
 	vector<UnitGroup *>		m_unitGroups;

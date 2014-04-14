@@ -2,7 +2,8 @@
 #include <assert.h>
 
 Blackboard::Blackboard(Blackboard * parent) :
-	m_parent(parent)
+	m_parent(parent),
+	m_unitGroup(NULL)
 {
 }
 
@@ -23,6 +24,11 @@ void Blackboard::SetPosition(string const & name, Position const & pos)
 void Blackboard::SetInt(string const & name, int value)
 {
 	m_ints[name] = value;
+}
+
+void Blackboard::SetUnitGroup(UnitGroup * group)
+{
+	m_unitGroup = group;
 }
 
 bool Blackboard::GetUnit(string const & name, Unit & unit) const
@@ -68,6 +74,11 @@ bool Blackboard::GetInt(string const & name, int & value) const
 		return m_parent->GetInt(name, value);
 
 	return false;
+}
+
+UnitGroup * Blackboard::GetUnitGroup() const
+{
+	return m_unitGroup;
 }
 
 void Blackboard::RemoveUnit(string const & name)

@@ -1,6 +1,5 @@
 #include "BehaviorTree.h"
 #include "Blackboard.h"
-#include <assert.h>
 
 Blackboard * s_blackboard = NULL;
 
@@ -260,86 +259,10 @@ BH_STATUS ActiveSelector::Update(float deltaTime)
 
 ////////////////////////////////////////////////////
 
-void MoveTo::OnInitialize()
-{
-	Unit owner;
-	bool result = s_blackboard->GetUnit("owner", owner);
-	assert(result);
-
-	int attack = 0;
-	s_blackboard->GetInt("moveattack", attack);
-	m_moveAttack = attack != 0;
-
-	result = s_blackboard->GetPosition("moveto", m_pos);
-	//assert(result);
-	m_pos = owner->getPosition();
-	m_pos.x -= 200;
-	//m_pos.y += 100;
-}
-
-BH_STATUS MoveTo::Update(float deltaTime)
-{
-	Unit owner;
-	if(!s_blackboard->GetUnit("owner", owner))
-		return BH_FAILURE;
-
-	if(owner->isMoving())
-		return BH_RUNNING;
-
-	Position pos = owner->getPosition();
-	if(pos.getApproxDistance(m_pos) < 2.0f)
-		return BH_SUCCESS;
-	if(GetStatus() == BH_RUNNING)
-		return BH_FAILURE;
-
-	if(!m_moveAttack)
-		owner->move(m_pos);
-	else
-		owner->attack(m_pos);
-
-	return BH_RUNNING;
-}
-
-//////////////////////////////
-// ATTACK BEHAVIOR
-//////////////////////////////
-
-void Attack::OnInitialize()
-{
-	bool result = s_blackboard->GetUnit("target", m_target);
-	assert(result);
-}
-
-BH_STATUS Attack::Update(float deltaTime)
-{
-	if(!m_target->exists())
-		return BH_FAILURE;
-
-	Unit owner;
-	if(!s_blackboard->GetUnit("owner", owner))
-		return BH_FAILURE;
-
-	UnitCommand currentCmd(owner->getLastCommand());
-
-	if (currentCmd.getType() == UnitCommandTypes::Attack_Unit && currentCmd.getTarget() == m_target)
-		return BH_RUNNING;
-
-	if (owner->isAttackFrame()) // Unit is in Attack animation
-		return BH_RUNNING;
-
-	//Unit is not attacking its designated target, make it do so
-
-	owner->attack(m_target);
-	return BH_SUCCESS;
-
-	//Does this ever fail?
-
-	//@TODO: DebugDraw
-}
-
 void Delay::OnInitialize()
 {
-	m_delayLeft = 3.0f;
+	assert(m_totalDelay > 0.0f);
+	m_delayLeft = m_totalDelay;
 }
 
 BH_STATUS Delay::Update(float deltaTime)

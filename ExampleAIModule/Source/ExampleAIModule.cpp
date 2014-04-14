@@ -1,4 +1,5 @@
 #include "ExampleAIModule.h"
+#include "ActionBehaviors.h"
 #include "BehaviorTree.h"
 #include "Blackboard.h"
 #include "UnitGroup.h"
@@ -277,9 +278,9 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
 	{
 		BTBuilder test(SEQ);
 			test.AddAction(new MoveTo())
-				.AddAction(new Delay())
+				.AddAction(new Delay(1))
 				.AddSequence()
-					.AddAction(new Delay())
+					.AddAction(new MoveTo())
 				.End();
 
 		Behavior * root = test.GetTree(); //= new Sequence();
