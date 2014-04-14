@@ -180,6 +180,7 @@ public:
 
 private:
 	Position				m_pos;
+	bool					m_moveAttack;
 };
 
 class Attack : public Behavior

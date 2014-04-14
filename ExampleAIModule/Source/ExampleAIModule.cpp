@@ -4,6 +4,7 @@
 #include "UnitGroup.h"
 #include <hash_map>
 #include <iostream>
+#include "BTBuilder.h"
 
 using namespace BWAPI;
 using namespace Filter;
@@ -274,12 +275,20 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
 	Broodwar->sendText("onUnitCreate %s!", unit->getType().getName().c_str());
 	if(unit->getPlayer() == Broodwar->self())
 	{
-		Behavior * root = new Sequence();
-		root->AddChild(new MoveTo());
-		root->AddChild(new Delay());
+		BTBuilder test(SEQ);
+			test.AddAction(new MoveTo())
+				.AddAction(new Delay())
+				.AddSequence()
+					.AddAction(new Delay())
+				.End();
+
+		Behavior * root = test.GetTree(); //= new Sequence();
+		//root->AddChild(new MoveTo());
+		//root->AddChild(new Delay());
 
 		// Own unit detected, create group
-		UnitGroup * group = new UnitGroup(unit, root, m_blackboard);
+		UnitGroup * group = new UnitGroup(root, m_blackboard);
+		group->AddUnit(unit);
 		m_unitGroups.push_back(group);
 	}
 
@@ -300,6 +309,11 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
 
 void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit)
 {
+	for(auto it = m_unitGroups.begin(); it != m_unitGroups.end(); ++it)
+	{
+		UnitGroup * group = *it;
+		group->RemoveUnit(unit);
+	}
 }
 
 void ExampleAIModule::onUnitMorph(BWAPI::Unit unit)

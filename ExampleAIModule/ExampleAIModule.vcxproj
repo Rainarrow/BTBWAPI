@@ -38,7 +38,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Starcraft Forever\bwapi-data\AI</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\Starcraft\bwapi-data\AI</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
@@ -98,6 +98,7 @@
   <ItemGroup>
     <ClCompile Include="Source\BehaviorTree.cpp" />
     <ClCompile Include="Source\Blackboard.cpp" />
+    <ClCompile Include="Source\BTBuilder.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\ExampleAIModule.cpp" />
     <ClCompile Include="Source\UnitGroup.cpp" />
@@ -105,6 +106,7 @@
   <ItemGroup>
     <ClInclude Include="Source\BehaviorTree.h" />
     <ClInclude Include="Source\Blackboard.h" />
+    <ClInclude Include="Source\BTBuilder.h" />
     <ClInclude Include="Source\ExampleAIModule.h" />
     <ClInclude Include="Source\UnitGroup.h" />
   </ItemGroup>

@@ -3,16 +3,13 @@
 #include "Blackboard.h"
 #include <assert.h>
 
-using namespace BWAPI;
-
-UnitGroup::UnitGroup(Unit unit, Behavior * root, Blackboard * globalBlackboard) :
-	m_unit(unit),
+UnitGroup::UnitGroup(Behavior * root, Blackboard * globalBlackboard) :
 	m_root(root),
 	m_globalBlackboard(globalBlackboard),
-	m_localBlackboard(new Blackboard())
+	m_localBlackboard(NULL)
 {
+	m_localBlackboard = new Blackboard(m_globalBlackboard);
 	assert(m_root);
-	m_localBlackboard->SetUnit("owner", m_unit);
 }
 
 UnitGroup::~UnitGroup()
@@ -21,9 +18,20 @@ UnitGroup::~UnitGroup()
 	SafeDelete(m_localBlackboard);
 }
 
+void UnitGroup::AddUnit(Unit unit)
+{
+	m_units.push_back(unit);
+	m_localBlackboard->SetUnit("owner", unit);
+}
+
+void UnitGroup::RemoveUnit(Unit unit)
+{
+	m_units.remove(unit);
+}
+
 void UnitGroup::Update()
 {
-	if(m_unit->exists())
+	if(!m_units.empty())
 	{
 		s_blackboard = m_localBlackboard;
 		m_root->Tick(0.067f);
@@ -36,9 +44,9 @@ Position UnitGroup::CalcCenterPosition() const
 
 	Position result(0, 0);
 
-	for (const auto u : m_units)
+	for(auto it = m_units.begin(); it != m_units.end(); ++it)
 	{
-		result += u->getPosition();
+		result += (*it)->getPosition();
 	}
 
 	result.x /= m_units.size();
