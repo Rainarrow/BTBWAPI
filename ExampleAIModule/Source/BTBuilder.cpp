@@ -35,6 +35,9 @@ BTBuilder& BTBuilder::End()
 		m_internalNodes.pop();
 	}
 
+	if(m_flags.top() == ILAN)
+		BWAPI::Broodwar->sendText("Warning: Ilan detected.");
+
 	m_flags.pop();
 
 	return *this;

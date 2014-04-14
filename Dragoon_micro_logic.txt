@@ -32,7 +32,7 @@ For enemies u in self.range():
     Target the one with the lowest health
 	
 If(NoTarget) // No target in range
-  Target the nearest one
+  Target the nearest one //Minimize movement
   
 
 2. Dancing
