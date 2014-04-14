@@ -1,0 +1,57 @@
+Dragoon micro
+
+0. Stances
+
+Applies to the whole group
+
+Aggresive:
+  -Never fall back except when hpCritical
+  -Push towards enemies during weapon cooldown to prevent escape
+  -Prefer max dmg output to proper focus fire // Always targeting the nearest target
+ 
+Defensive:
+  -Fall back in weapon cooldown // Dance
+  -Move forward to attack, always focus fire when possible even if need to move more
+
+0a. Stances switching:
+
+For every tick:
+  if (SelfGroup.totalHP() > EnemyGroup.totalHP() %% SelfGroup.unitCount() > EnemyGroup.unitCount())
+    Switch to Aggresive
+  else
+    
+	Defensive
+  
+1. Targeting
+
+In order of priority:
+
+For enemies u in self.range():
+  Ignore those with ratio = u->hp() / u->beingTargetedBy() * self.dmg() < 1; // Those gonna be killed in the next volley
+  For those with ratio > 1
+    Target the one with the lowest health
+	
+If(NoTarget) // No target in range
+  Target the nearest one
+  
+
+2. Dancing
+
+  if(hpCritical && beingAtked)
+    fallback();
+	
+  if(defensive)
+    if(weaponCooldown())
+	  fallback()
+	if(weaponReady())
+	  GoBackToAtk()
+ 
+3. Movement
+
+  if(notArrived)
+    MoveTo(target)
+  if(tooFarFromGroupCenter)
+    MoveTo(GroupCenter)
+
+  
+  

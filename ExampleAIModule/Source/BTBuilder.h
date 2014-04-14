@@ -1,7 +1,7 @@
 #include "BehaviorTree.h"
 #include <stack>
 
-enum BTFLAGS {SEQ, SEL, ACT};
+enum BTFLAGS {SEQ, SEL, ASEL, PAR, ACT};
 
 
 class BTBuilder 
