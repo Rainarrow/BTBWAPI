@@ -1,5 +1,6 @@
 #include "ExampleAIModule.h"
 #include "BehaviorTree.h"
+#include "ActionBehaviors.h"
 #include "Blackboard.h"
 #include "UnitGroup.h"
 #include <hash_map>
@@ -14,7 +15,7 @@ void ExampleAIModule::onStart()
 	Broodwar->enableFlag(Flag::UserInput);
 
 	// Uncomment the following line and the bot will know about everything through the fog of war (cheat).
-	Broodwar->enableFlag(Flag::CompleteMapInformation);
+	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 
 	// Set the command optimization level so that common commands can be grouped
 	// and reduce the bot's APM (Actions Per Minute).
@@ -43,6 +44,7 @@ void ExampleAIModule::onStart()
 	}
 
 	m_blackboard = new Blackboard();
+	CreateUnitGroups();
 }
 
 void ExampleAIModule::onEnd(bool isWinner)
@@ -261,18 +263,16 @@ void ExampleAIModule::onUnitEvade(BWAPI::Unit unit)
 
 void ExampleAIModule::onUnitShow(BWAPI::Unit unit)
 {
-	Broodwar->sendText("onUnitShow %s!", unit->getType().getName().c_str());
+	//Broodwar->sendText("onUnitShow %s!", unit->getType().getName().c_str());
 }
 
 void ExampleAIModule::onUnitHide(BWAPI::Unit unit)
 {
-	Broodwar->sendText("onUnitHide %s!", unit->getType().getName().c_str());
+	//Broodwar->sendText("onUnitHide %s!", unit->getType().getName().c_str());
 }
 
-void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
+void ExampleAIModule::CreateUnitGroups()
 {
-	Broodwar->sendText("onUnitCreate %s!", unit->getType().getName().c_str());
-	if(unit->getPlayer() == Broodwar->self())
 	{
 		/*
 		BTBuilder().
@@ -286,14 +286,26 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
 		.End();
 		*/
 
-		Behavior * root = new Sequence();
-		root->AddChild(new MoveTo());
-		root->AddChild(new Delay());
+		Behavior * root = new Selector();
+			Behavior * seq = new Sequence();
+			seq->AddChild(new FindTarget());
+			seq->AddChild(new Attack());
+		root->AddChild(seq);
+		root->AddChild(new Delay(2));
 
 		// Own unit detected, create group
 		UnitGroup * group = new UnitGroup(root, m_blackboard);
-		group->AddUnit(unit);
 		m_unitGroups.push_back(group);
+	}
+}
+
+void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
+{
+	Broodwar->sendText("onUnitCreate %s!", unit->getType().getName().c_str());
+	if(unit->getPlayer() == Broodwar->self())
+	{
+		// Own unit detected, add to group
+		m_unitGroups[0]->AddUnit(unit);
 	}
 
 	/*

@@ -9,6 +9,7 @@ UnitGroup::UnitGroup(Behavior * root, Blackboard * globalBlackboard) :
 	m_localBlackboard(NULL)
 {
 	m_localBlackboard = new Blackboard(m_globalBlackboard);
+	m_localBlackboard->SetUnitGroup(this);
 	assert(m_root);
 }
 
@@ -21,7 +22,10 @@ UnitGroup::~UnitGroup()
 void UnitGroup::AddUnit(Unit unit)
 {
 	m_units.push_back(unit);
-	m_localBlackboard->SetUnit("owner", unit);
+	char name[20];
+	sprintf_s(name, 20, "owner%d", m_units.size() - 1);
+	m_localBlackboard->SetUnit(name, unit);
+	m_localBlackboard->SetInt("ownercount", m_units.size());
 }
 
 void UnitGroup::RemoveUnit(Unit unit)
@@ -53,5 +57,10 @@ Position UnitGroup::CalcCenterPosition() const
 	result.y /= m_units.size();
 
 	return result;
-
 }
+
+list<Unit> const & UnitGroup::GetUnits() const
+{
+	return m_units;
+}
+

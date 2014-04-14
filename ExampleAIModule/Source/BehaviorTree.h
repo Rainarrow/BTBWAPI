@@ -1,10 +1,11 @@
 #pragma once
 
 #include <BWAPI.h>
+#include <assert.h>
 #include <vector>
 #include <string>
+
 using namespace std;
-using namespace BWAPI;
 
 ////////////////////////////////////////////////////
 
@@ -171,39 +172,18 @@ public:
 
 ////////////////////////////////////////////////////
 
-class MoveTo : public Behavior
-{
-public:
-
-	virtual void			OnInitialize();
-	virtual BH_STATUS		Update(float deltaTime);
-
-private:
-	Position				m_pos;
-	bool					m_moveAttack;
-};
-
-class Attack : public Behavior
-{
-public:
-
-	virtual void			OnInitialize();
-	virtual BH_STATUS		Update(float deltaTime);
-
-private:
-	Unit					m_target;
-};
-
 class Delay : public Behavior
 {
 public:
+	Delay(float time) : m_totalDelay(time) {}
 
 	virtual void			OnInitialize();
 	virtual BH_STATUS		Update(float deltaTime);
 	void					SetDelay(float delay);
 
 private:
-	float					m_delayLeft;
+	float					m_totalDelay, m_delayLeft;
 };
+
 class Blackboard;
 extern Blackboard * s_blackboard;
