@@ -1,14 +1,18 @@
 #include "BehaviorTree.h"
 #include <stack>
 
-enum BTFLAGS {SEQ, SEL, ASEL, PAR, ACT};
+enum BTFLAGS {SEQ, SEL, ASEL, PAR, ILAN, ACT};
 
 
 class BTBuilder 
 {
 public:
-	BTBuilder(BTFLAGS NodeType); 
+	BTBuilder(BTFLAGS NodeType, Parallel::POLICY forSuccess, Parallel::POLICY forFailure); 
 	BTBuilder& AddSequence();
+	BTBuilder& AddSelector();
+	BTBuilder& AddActiveSelector();
+	BTBuilder& AddParallel(Parallel::POLICY forSuccess, Parallel::POLICY forFailure);
+
 	BTBuilder& AddAction(Behavior * action);
 	BTBuilder& End();
 	Behavior * GetTree();
