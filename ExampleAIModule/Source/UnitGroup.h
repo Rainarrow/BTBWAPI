@@ -21,6 +21,7 @@ public:
 	Position				CalcCenterPosition() const; //Returns the average position of the group
 	bool					IsPositionWalkable(const Position& pos) const;
 	list<Unit> const &		GetUnits() const;
+	bool					UnitReadyToAtk(const Unit& unit) const;
 
 private:
 	list<Unit>				m_units;

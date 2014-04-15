@@ -34,3 +34,4 @@ public:
 	virtual void			OnInitialize();
 	virtual BH_STATUS		Update(float deltaTime);
 };
+

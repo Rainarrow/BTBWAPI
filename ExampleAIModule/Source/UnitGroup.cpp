@@ -63,3 +63,8 @@ list<Unit> const & UnitGroup::GetUnits() const
 {
 	return m_units;
 }
+
+bool UnitGroup::UnitReadyToAtk(const Unit& unit) const
+{
+	return (unit->getAirWeaponCooldown() == 0 || unit->getGroundWeaponCooldown());
+}

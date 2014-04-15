@@ -77,17 +77,26 @@ BH_STATUS Attack::Update(float deltaTime)
 		UnitCommand currentCmd(unit->getLastCommand());
 
 		if (currentCmd.getType() == UnitCommandTypes::Attack_Unit && currentCmd.getTarget() == m_target)
+		{
+			Broodwar->drawLine(CoordinateType::Map, unit->getPosition().x, unit->getPosition().y, m_target->getPosition().x, m_target->getPosition().y, Colors::Red);
 			continue;
-
+		}
 		if (unit->isAttackFrame()) // Unit is in Attack animation
+		{
+			Broodwar->drawLine(CoordinateType::Map, unit->getPosition().x, unit->getPosition().y, m_target->getPosition().x, m_target->getPosition().y, Colors::Red);
 			continue;
+		}
 
 		//Unit is not attacking its designated target, make it do so
 		unit->attack(m_target);
+
+		//Debug draw
+		Broodwar->drawLine(CoordinateType::Map, unit->getPosition().x, unit->getPosition().y, m_target->getPosition().x, m_target->getPosition().y, Colors::Red);
 	}
 
 	return attacking ? BH_RUNNING : BH_FAILURE;
 }
+
 
 ////////////////////////////////////////////////////
 // FindTarget
