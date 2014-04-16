@@ -2,8 +2,6 @@
 
 #include "BehaviorTree.h"
 
-using namespace BWAPI;
-
 class MoveTo : public Behavior
 {
 public:
@@ -35,3 +33,8 @@ public:
 	virtual BH_STATUS		Update(float deltaTime);
 };
 
+class CalculateFallbackPos : public Behavior
+{
+public:
+	virtual BH_STATUS		Update(float deltaTime);
+};

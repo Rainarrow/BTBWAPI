@@ -239,7 +239,7 @@ void Parallel::OnTerminate(BH_STATUS status)
 
 void ActiveSelector::OnInitialize()
 {
-	assert(!"Not to be called");
+	//assert(!"Not to be called");
 	m_currentChild = m_children.end();
 }
 

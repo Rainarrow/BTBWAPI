@@ -35,7 +35,7 @@ private:
 
 	void					CreateUnitGroups();
 
-	Behavior *						m_tacticalBehavior;
-	Blackboard *					m_blackboard;
-	hash_map<int, UnitGroup *>		m_unitGroups;
+	Behavior *				m_tacticalBehavior;
+	Blackboard *			m_blackboard;
+	vector<UnitGroup *>		m_unitGroups;
 };

@@ -1,7 +1,7 @@
 #include "ExampleAIModule.h"
-#include "BTBuilder.h"
 #include "BehaviorTree.h"
 #include "ActionBehaviors.h"
+#include "ConditionBehaviors.h"
 #include "Blackboard.h"
 #include "UnitGroup.h"
 #include "BTBuilder.h"
@@ -59,7 +59,7 @@ void ExampleAIModule::onEnd(bool isWinner)
 	SafeDelete(m_blackboard);
 
 	for(auto it = m_unitGroups.begin(); it != m_unitGroups.end(); ++it)
-		SafeDelete(it->second);
+		SafeDelete(*it);
 	m_unitGroups.clear();
 }
 
@@ -80,7 +80,7 @@ void ExampleAIModule::onFrame()
 		return;
 
 	for(auto it = m_unitGroups.begin(); it != m_unitGroups.end(); ++it)
-		it->second->Update();
+		(*it)->Update();
 	return;
 
 	// Iterate through all the units that we own
@@ -288,28 +288,30 @@ void ExampleAIModule::CreateUnitGroups()
 		.End();
 		*/
 
-		/*
-		Behavior * root = new Selector();
-			Behavior * seq1 = new Sequence();
-				seq1->AddChild(new FindTarget());
-				seq1->AddChild(new Attack());
-			root->AddChild(seq1);
-		root->AddChild(new Delay(2));
-		*/
-		BTBuilder BT(new Selector);
-		BT.AddSequence()
-			.AddAction((new FindTarget))
-			.AddAction(new Attack)
+		for(int i = 0; i < 8; ++i)
+		{
+			BTBuilder BT(new ActiveSelector);
+			BT
 				.AddSequence()
-				.AddAction(new Delay(2))
+					.AddAction(new IsLowHp)
+					.AddAction(new IsBeingAttacked)
+					.AddSequence()
+						.AddAction(new CalculateFallbackPos)
+						.AddAction(new MoveTo)
+					.End()
 				.End()
-			.End();
+				.AddSequence()
+					.AddAction((new FindTarget))
+					.AddAction(new Attack)
+				.End()
+				.AddSequence()
+					.AddAction(new Delay(2))
+				.End();
 
-		Behavior * root = BT.GetTree();
-
-		// Own unit detected, create group
-		UnitGroup * group = new UnitGroup(root, m_blackboard);
-		m_unitGroups[UnitTypes::Enum::Protoss_Dragoon] = group;
+			// Own unit detected, create group
+			UnitGroup * group = new UnitGroup(UnitTypes::Enum::Protoss_Dragoon, 1, BT.GetTree(), m_blackboard);
+			m_unitGroups.push_back(group);
+		}
 	}
 }
 
@@ -319,16 +321,18 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
 	if(unit->getPlayer() == Broodwar->self())
 	{
 		// Own unit detected, add to group
-		auto it = m_unitGroups.find(unit->getType());
-		if(it != m_unitGroups.end())
+		auto it = m_unitGroups.begin();
+		for( ; it != m_unitGroups.end(); ++it)
 		{
-			it->second->AddUnit(unit);
+			UnitGroup * group = *it;
+			if(group->AddUnit(unit))
+				break;
 		}
-		else
+
+		if(it == m_unitGroups.end())
 		{
 			Broodwar->sendText("No group: %s!", unit->getType().getName().c_str());
 		}
-		//m_unitGroups[0]->AddUnit(unit);
 	}
 
 	/*
@@ -350,8 +354,7 @@ void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit)
 {
 	for(auto it = m_unitGroups.begin(); it != m_unitGroups.end(); ++it)
 	{
-		UnitGroup * group = it->second;
-		group->RemoveUnit(unit);
+		(*it)->RemoveUnit(unit);
 	}
 }
 

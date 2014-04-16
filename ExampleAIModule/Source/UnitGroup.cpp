@@ -3,7 +3,9 @@
 #include "Blackboard.h"
 #include <assert.h>
 
-UnitGroup::UnitGroup(Behavior * root, Blackboard * globalBlackboard) :
+UnitGroup::UnitGroup(int unitType, unsigned unitCnt, Behavior * root, Blackboard * globalBlackboard) :
+	m_unitType(unitType),
+	m_unitCnt(unitCnt),
 	m_root(root),
 	m_globalBlackboard(globalBlackboard),
 	m_localBlackboard(NULL)
@@ -19,13 +21,18 @@ UnitGroup::~UnitGroup()
 	SafeDelete(m_localBlackboard);
 }
 
-void UnitGroup::AddUnit(Unit unit)
+bool UnitGroup::AddUnit(Unit unit)
 {
-	m_units.push_back(unit);
-	char name[20];
-	sprintf_s(name, 20, "owner%d", m_units.size() - 1);
-	m_localBlackboard->SetUnit(name, unit);
-	m_localBlackboard->SetInt("ownercount", m_units.size());
+	if(unit->getType() == m_unitType && m_units.size() < m_unitCnt)
+	{
+		m_units.push_back(unit);
+		char name[20];
+		sprintf_s(name, 20, "owner%d", m_units.size() - 1);
+		m_localBlackboard->SetUnit(name, unit);
+		m_localBlackboard->SetInt("groupsize", m_units.size());
+		return true;
+	}
+	return false;
 }
 
 void UnitGroup::RemoveUnit(Unit unit)

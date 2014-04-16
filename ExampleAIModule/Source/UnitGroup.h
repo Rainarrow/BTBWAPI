@@ -11,10 +11,10 @@ class Behavior;
 class UnitGroup
 {
 public:
-	UnitGroup(Behavior * root, Blackboard * globalBlackboard);
+	UnitGroup(int unitType, unsigned unitCnt, Behavior * root, Blackboard * globalBlackboard);
 	~UnitGroup();
 
-	void					AddUnit(Unit unit);
+	bool					AddUnit(Unit unit);
 	void					RemoveUnit(Unit unit);
 	void					Update();
 
@@ -24,6 +24,8 @@ public:
 	bool					UnitReadyToAtk(const Unit& unit) const;
 
 private:
+	int						m_unitType;
+	unsigned				m_unitCnt;
 	list<Unit>				m_units;
 	Behavior *				m_root;
 	Blackboard *			m_globalBlackboard;

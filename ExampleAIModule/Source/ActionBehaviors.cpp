@@ -26,7 +26,7 @@ void MoveTo::OnInitialize()
 
 BH_STATUS MoveTo::Update(float deltaTime)
 {
-	Unit owner;
+	Unit owner = NULL;
 	if(!s_blackboard->GetUnit("owner0", owner))
 		return BH_FAILURE;
 
@@ -117,8 +117,8 @@ BH_STATUS FindTarget::Update(float deltaTime)
 
 	Unit target = NULL;
 	int bestScore = 500;
-	Unitset myUnits = Broodwar->enemy()->getUnits();
-	for(Unitset::iterator unit = myUnits.begin(); unit != myUnits.end(); ++unit)
+	Unitset units = Broodwar->enemy()->getUnits();
+	for(Unitset::iterator unit = units.begin(); unit != units.end(); ++unit)
 	{
 		int score = unit->getHitPoints();
 		score -= center.getApproxDistance(unit->getPosition()) / TILE_SIZE;
@@ -139,3 +139,46 @@ BH_STATUS FindTarget::Update(float deltaTime)
 		return BH_FAILURE;
 	}
 }
+
+////////////////////////////////////////////////////
+// CalculateFallbackPos
+////////////////////////////////////////////////////
+
+BH_STATUS CalculateFallbackPos::Update(float deltaTime)
+{
+	Unit owner = NULL;
+	s_blackboard->GetUnit("owner0", owner);
+	if(owner == NULL || !owner->exists() || !owner->isUnderAttack())
+		return BH_FAILURE;
+
+	Player player = owner->getLastAttackingPlayer();
+	if(player == NULL)
+		return BH_FAILURE;
+
+	WeaponType wtype = owner->getType().groundWeapon();
+	int radius = wtype.maxRange() * TILE_SIZE;
+	Unitset units = owner->getUnitsInRadius(radius);
+	if(units.empty())
+		return BH_FAILURE;
+
+	Position attackPos;
+	units = Broodwar->enemy()->getUnits();
+	if(units.empty())
+		return BH_FAILURE;
+	for(Unitset::iterator unit = units.begin(); unit != units.end(); ++unit)
+	{
+		//if(unit->getPlayer() != owner->getPlayer())
+		{
+			attackPos += unit->getPosition();
+		}
+	}
+	attackPos /= units.size();
+
+	Position dir = owner->getPosition() - attackPos;
+	dir /= 2;
+	//dir *= (int)(TILE_SIZE * 2.0f / dir.getLength());
+	Position pos = owner->getPosition() + dir;
+	s_blackboard->SetPosition("moveto", pos);
+	return BH_SUCCESS;
+}
+

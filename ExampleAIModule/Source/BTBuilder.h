@@ -1,3 +1,4 @@
+#pragma once
 #include "BehaviorTree.h"
 #include <stack>
 
