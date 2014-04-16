@@ -61,6 +61,7 @@ public:
 	virtual void			OnTerminate(BH_STATUS) {}
 	virtual BH_STATUS		Update(float deltaTime) = 0;
 	virtual void			AddChild(Behavior * child) {}
+	virtual bool			IsInternal() const { return false; }
 
 	BH_STATUS				Tick(float deltaTime);
 	void					Reset();
@@ -84,6 +85,7 @@ public:
 	Decorator() : m_child(NULL) {}
 	virtual ~Decorator();
 	virtual void			AddChild(Behavior * child);
+	virtual bool			IsLeafNode() const { return true; }
 
 protected:
 	Behavior *				m_child;

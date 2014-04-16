@@ -1,4 +1,5 @@
 #include "ExampleAIModule.h"
+#include "BTBuilder.h"
 #include "BehaviorTree.h"
 #include "ActionBehaviors.h"
 #include "Blackboard.h"
@@ -287,12 +288,24 @@ void ExampleAIModule::CreateUnitGroups()
 		.End();
 		*/
 
+		/*
 		Behavior * root = new Selector();
 			Behavior * seq1 = new Sequence();
 				seq1->AddChild(new FindTarget());
 				seq1->AddChild(new Attack());
 			root->AddChild(seq1);
 		root->AddChild(new Delay(2));
+		*/
+		BTBuilder BT(new Selector);
+		BT.AddSequence()
+			.AddAction((new FindTarget))
+			.AddAction(new Attack)
+				.AddSequence()
+				.AddAction(new Delay(2))
+				.End()
+			.End();
+
+		Behavior * root = BT.GetTree();
 
 		// Own unit detected, create group
 		UnitGroup * group = new UnitGroup(root, m_blackboard);

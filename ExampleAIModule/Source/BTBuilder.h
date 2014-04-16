@@ -1,13 +1,13 @@
 #include "BehaviorTree.h"
 #include <stack>
 
-enum BTFLAGS {SEQ, SEL, ASEL, PAR, ILAN, ACT};
+enum NODETYPE {SEQ, SEL, ASEL, PAR, DEC, ACT}; //WARNING: BEHAVIORTREE.H HAS ITS OWN COPY OF THIS; KEEP THOSE IDENTICAL
 
 
 class BTBuilder 
 {
 public:
-	BTBuilder(BTFLAGS NodeType, Parallel::POLICY forSuccess, Parallel::POLICY forFailure); 
+	BTBuilder(Behavior * root);
 	BTBuilder& AddSequence();
 	BTBuilder& AddSelector();
 	BTBuilder& AddActiveSelector();
@@ -15,12 +15,9 @@ public:
 
 	BTBuilder& AddAction(Behavior * action);
 	BTBuilder& End();
-	Behavior * GetTree();
+	Behavior * GetTree() const;
 
 private:
-	std::stack<BTFLAGS> m_flags;
-	Behavior * m_root;
 	std::stack<Behavior *> m_internalNodes;
-	Behavior * m_currentNode;
-	int m_depthCounter;
+	Behavior * m_root;
 };
