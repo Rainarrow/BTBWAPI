@@ -3,6 +3,7 @@
 #include "ActionBehaviors.h"
 #include "Blackboard.h"
 #include "UnitGroup.h"
+#include "BTBuilder.h"
 #include <hash_map>
 #include <iostream>
 
@@ -57,7 +58,7 @@ void ExampleAIModule::onEnd(bool isWinner)
 	SafeDelete(m_blackboard);
 
 	for(auto it = m_unitGroups.begin(); it != m_unitGroups.end(); ++it)
-		SafeDelete(*it);
+		SafeDelete(it->second);
 	m_unitGroups.clear();
 }
 
@@ -78,7 +79,7 @@ void ExampleAIModule::onFrame()
 		return;
 
 	for(auto it = m_unitGroups.begin(); it != m_unitGroups.end(); ++it)
-		(*it)->Update();
+		it->second->Update();
 	return;
 
 	// Iterate through all the units that we own
@@ -287,25 +288,34 @@ void ExampleAIModule::CreateUnitGroups()
 		*/
 
 		Behavior * root = new Selector();
-			Behavior * seq = new Sequence();
-			seq->AddChild(new FindTarget());
-			seq->AddChild(new Attack());
-		root->AddChild(seq);
+			Behavior * seq1 = new Sequence();
+				seq1->AddChild(new FindTarget());
+				seq1->AddChild(new Attack());
+			root->AddChild(seq1);
 		root->AddChild(new Delay(2));
 
 		// Own unit detected, create group
 		UnitGroup * group = new UnitGroup(root, m_blackboard);
-		m_unitGroups.push_back(group);
+		m_unitGroups[UnitTypes::Enum::Protoss_Dragoon] = group;
 	}
 }
 
 void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
 {
-	Broodwar->sendText("onUnitCreate %s!", unit->getType().getName().c_str());
+	//Broodwar->sendText("onUnitCreate %s!", unit->getType().getName().c_str());
 	if(unit->getPlayer() == Broodwar->self())
 	{
 		// Own unit detected, add to group
-		m_unitGroups[0]->AddUnit(unit);
+		auto it = m_unitGroups.find(unit->getType());
+		if(it != m_unitGroups.end())
+		{
+			it->second->AddUnit(unit);
+		}
+		else
+		{
+			Broodwar->sendText("No group: %s!", unit->getType().getName().c_str());
+		}
+		//m_unitGroups[0]->AddUnit(unit);
 	}
 
 	/*
@@ -327,7 +337,7 @@ void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit)
 {
 	for(auto it = m_unitGroups.begin(); it != m_unitGroups.end(); ++it)
 	{
-		UnitGroup * group = *it;
+		UnitGroup * group = it->second;
 		group->RemoveUnit(unit);
 	}
 }

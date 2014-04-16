@@ -1,6 +1,6 @@
 #pragma once
 #include <BWAPI.h>
-#include <vector>
+#include <hash_map>
 using namespace std;
 
 // Remember not to use "Broodwar" in any global class constructor!
@@ -35,7 +35,7 @@ private:
 
 	void					CreateUnitGroups();
 
-	Behavior *				m_tacticalBehavior;
-	Blackboard *			m_blackboard;
-	vector<UnitGroup *>		m_unitGroups;
+	Behavior *						m_tacticalBehavior;
+	Blackboard *					m_blackboard;
+	hash_map<int, UnitGroup *>		m_unitGroups;
 };

@@ -30,6 +30,8 @@ BH_STATUS MoveTo::Update(float deltaTime)
 	if(!s_blackboard->GetUnit("owner0", owner))
 		return BH_FAILURE;
 
+	Broodwar->drawLine(CoordinateType::Map, owner->getPosition().x, owner->getPosition().y, m_pos.x, m_pos.y, m_moveAttack ? Colors::Red : Colors::White);
+
 	if(owner->isMoving())
 		return BH_RUNNING;
 
