@@ -36,10 +36,17 @@ private:
 	Unit					m_target;
 };
 
-class FindTarget : public Behavior
+class GroupAttack : public Behavior
 {
 public:
 
+	virtual void			OnInitialize();
+	virtual BH_STATUS		Update(float deltaTime);
+};
+
+class FindTarget : public Behavior
+{
+public:
 	virtual void			OnInitialize();
 	virtual BH_STATUS		Update(float deltaTime);
 };

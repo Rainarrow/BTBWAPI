@@ -106,8 +106,8 @@ BH_STATUS Negate::Update(float deltaTime)
 		return BH_SUCCESS;
 	if (m_child->GetStatus() == BH_SUCCESS)
 		return BH_FAILURE;
-	if (m_child->GetStatus() == BH_INVALID)
-		return BH_INVALID;
+
+	return BH_INVALID;
 }
 
 ////////////////////////////////////////////////////

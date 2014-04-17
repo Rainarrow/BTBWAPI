@@ -92,13 +92,13 @@ void CS580::onFrame()
 
 	Unitset myUnits = Broodwar->self()->getUnits();
 
-	const int hpBarLength = 10;
+	const int hpBarLength = 20;
 	for (Unitset::iterator u = myUnits.begin(); u != myUnits.end(); ++u)
 	{
 		int totalHP = u->getHitPoints() + u->getShields();
 		int maxHP = u->getType().maxHitPoints() + u->getType().maxShields();
-		float ratio = totalHP / maxHP;
-		Broodwar->drawLine(CoordinateType::Map, u->getPosition().x - hpBarLength, u->getPosition().y, u->getPosition().x + (hpBarLength * ratio), u->getPosition().y, Colors::Green);
+		float ratio = (float)totalHP / maxHP;
+		Broodwar->drawLine(CoordinateType::Map, u->getPosition().x - hpBarLength / 2, u->getPosition().y, u->getPosition().x - hpBarLength / 2 + (int)(hpBarLength * ratio), u->getPosition().y, Colors::Green);
 	}
 	/*
 	// Iterate through all the units that we own
@@ -324,17 +324,29 @@ void CS580::CreateUnitGroups()
 				.AddSequence()
 					.AddAction((new FindTarget))
 					.AddAction(new Attack)
+				.End()
+				.AddSequence()
+					.AddAction(new Delay(2))
 				.End();
-				//.AddSequence()
-					//.AddAction(new Delay(2))
-				//.End();
 
 			// Own unit detected, create group
 			UnitGroup * group = new UnitGroup(UnitTypes::Enum::Protoss_Dragoon, 1, BT.GetTree(), m_blackboard);
 			m_unitGroups.push_back(group);
 		}
 	}
+
+	for(int i = 0; i < 8; ++i)
 	{
+		BTBuilder BT(new ActiveSelector);
+		BT
+			.AddSequence()
+				.AddAction((new FindTarget))
+				.AddAction(new Attack)
+			.End()
+			.AddSequence()
+				.AddAction(new Delay(2))
+			.End();
+		/*
 		BTBuilder BT(new ActiveSelector);
 		BT
 			.AddSequence()
@@ -344,15 +356,13 @@ void CS580::CreateUnitGroups()
 			.AddSequence()
 				.AddAction((new FindGroupMoveToEnemy))
 				.AddAction(new GroupMoveTo)
-				.AddAction(new FindCenterAttack)
-				.AddAction(new GroupMoveTo)
-			.End()
-			.AddSequence()
-				.AddAction(new Delay(2))
+				//.AddAction(new FindCenterAttack)
+				//.AddAction(new GroupMoveTo)
 			.End();
+		*/
 
 		// Own unit detected, create group
-		UnitGroup * group = new UnitGroup(UnitTypes::Enum::Protoss_Zealot, 3, BT.GetTree(), m_blackboard);
+		UnitGroup * group = new UnitGroup(UnitTypes::Enum::Protoss_Zealot, 1, BT.GetTree(), m_blackboard);
 		m_unitGroups.push_back(group);
 	}
 }
