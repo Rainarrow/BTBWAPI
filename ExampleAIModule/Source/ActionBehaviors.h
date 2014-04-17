@@ -40,7 +40,6 @@ class GroupAttack : public Behavior
 {
 public:
 
-	virtual void			OnInitialize();
 	virtual BH_STATUS		Update(float deltaTime);
 };
 
@@ -70,7 +69,7 @@ public:
 	virtual BH_STATUS		Update(float deltaTime);
 };
 
-class FindGroupMoveToEnemy : public Behavior
+class FindGroupTarget : public Behavior
 {
 public:
 	virtual BH_STATUS		Update(float deltaTime);

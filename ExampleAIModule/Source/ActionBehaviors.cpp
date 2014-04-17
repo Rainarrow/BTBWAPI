@@ -203,7 +203,7 @@ BH_STATUS GroupAttack::Update(float deltaTime)
 		Broodwar->drawLine(CoordinateType::Map, unit->getPosition().x, unit->getPosition().y, target->getPosition().x, target->getPosition().y, Colors::Red);
 	}
 
-	return attacking ? BH_RUNNING : BH_FAILURE;
+	return attacking ? BH_SUCCESS : BH_FAILURE;
 }
 
 ////////////////////////////////////////////////////
@@ -383,39 +383,28 @@ BH_STATUS CheckCriticalTarget::Update(float deltaTime)
 // FindGroupMoveToEnemy
 ////////////////////////////////////////////////////
 
-BH_STATUS FindGroupMoveToEnemy::Update(float deltaTime)
+BH_STATUS FindGroupTarget::Update(float deltaTime)
 {
-	Position center;
-	Unitset units = Broodwar->enemy()->getUnits();
-	if(units.empty())
-		return BH_FAILURE;
-	for(Unitset::iterator unit = units.begin(); unit != units.end(); ++unit)
-	{
-		center += unit->getPosition();
-	}
-	center /= Broodwar->enemy()->getUnits().size();
-
-	s_blackboard->SetInt("moveattack", 1);
-
-	int groupSize = 0;
-	s_blackboard->GetInt("groupsize", groupSize);
-	if(groupSize == 0)
-		return BH_FAILURE;
-
 	UnitGroup * group = s_blackboard->GetUnitGroup();
 	if(group == NULL || group->GetUnits().empty())
 		return BH_FAILURE;
 
-	Position groupCenter = group->CalcCenterPosition();
+	list<Unit> units = group->GetUnits();
+	Unitset enemies = Broodwar->enemy()->getUnits();
+	if(enemies.empty())
+		return BH_FAILURE;
 	int i = 0;
-	for(auto it = group->GetUnits().begin(); it != group->GetUnits().end(); ++it, ++i)
+	auto it = units.begin();
+	for(Unitset::iterator enemy = enemies.begin(); enemy != enemies.end(); ++enemy)
 	{
-		Unit unit = *it;
-		Position movePos = groupCenter - unit->getPosition();
-		movePos += center;
-		char name[10];
-		sprintf_s(name, 10, "moveto%d", i);
-		s_blackboard->SetPosition(name, movePos);
+		for(int unitsAssigned = 0; it != units.end() && unitsAssigned < 3; ++it, ++i)
+		{
+			++unitsAssigned;
+			char name[10];
+			sprintf_s(name, 10, "target%d", i);
+
+			s_blackboard->SetUnit(name, *enemy);
+		}
 	}
 
 	return BH_SUCCESS;

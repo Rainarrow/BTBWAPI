@@ -335,8 +335,9 @@ void CS580::CreateUnitGroups()
 		}
 	}
 
-	for(int i = 0; i < 8; ++i)
+	//for(int i = 0; i < 8; ++i)
 	{
+		/*
 		BTBuilder BT(new ActiveSelector);
 		BT
 			.AddSequence()
@@ -346,7 +347,7 @@ void CS580::CreateUnitGroups()
 			.AddSequence()
 				.AddAction(new Delay(2))
 			.End();
-		/*
+		*/
 		BTBuilder BT(new ActiveSelector);
 		BT
 			.AddSequence()
@@ -354,15 +355,14 @@ void CS580::CreateUnitGroups()
 				.AddAction(new Attack)
 			.End()
 			.AddSequence()
-				.AddAction((new FindGroupMoveToEnemy))
-				.AddAction(new GroupMoveTo)
+				.AddAction((new FindGroupTarget))
+				.AddAction(new GroupAttack)
 				//.AddAction(new FindCenterAttack)
 				//.AddAction(new GroupMoveTo)
 			.End();
-		*/
 
 		// Own unit detected, create group
-		UnitGroup * group = new UnitGroup(UnitTypes::Enum::Protoss_Zealot, 1, BT.GetTree(), m_blackboard);
+		UnitGroup * group = new UnitGroup(UnitTypes::Enum::Protoss_Zealot, 8, BT.GetTree(), m_blackboard);
 		m_unitGroups.push_back(group);
 	}
 }
