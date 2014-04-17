@@ -13,3 +13,9 @@ class IsBeingAttacked : public Behavior
 public:
 	virtual BH_STATUS		Update(float deltaTime);
 };
+
+class IsReadyToAttack : public Behavior
+{
+public:
+	virtual BH_STATUS		Update(float deltaTime);
+};

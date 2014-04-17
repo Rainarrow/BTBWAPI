@@ -63,6 +63,7 @@ Position UnitGroup::CalcCenterPosition() const
 	result.x /= m_units.size();
 	result.y /= m_units.size();
 
+//	Broodwar->drawCircle(CoordinateType::Map, result.x, result.y, 5.0f, Colors::Green, true);
 	return result;
 }
 

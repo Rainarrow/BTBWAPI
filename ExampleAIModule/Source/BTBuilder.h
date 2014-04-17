@@ -13,6 +13,7 @@ public:
 	BTBuilder& AddSelector();
 	BTBuilder& AddActiveSelector();
 	BTBuilder& AddParallel(Parallel::POLICY forSuccess, Parallel::POLICY forFailure);
+	BTBuilder& AddDecorator(Decorator * dec);
 
 	BTBuilder& AddAction(Behavior * action);
 	BTBuilder& End();

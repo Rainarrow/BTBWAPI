@@ -19,8 +19,6 @@ void MoveTo::OnInitialize()
 
 	result = s_blackboard->GetPosition("moveto", m_pos);
 	//assert(result);
-	m_pos = owner->getPosition();
-	m_pos.x -= 200;
 	//m_pos.y += 100;
 }
 
@@ -30,7 +28,7 @@ BH_STATUS MoveTo::Update(float deltaTime)
 	if(!s_blackboard->GetUnit("owner0", owner))
 		return BH_FAILURE;
 
-	Broodwar->drawLine(CoordinateType::Map, owner->getPosition().x, owner->getPosition().y, m_pos.x, m_pos.y, m_moveAttack ? Colors::Red : Colors::White);
+	Broodwar->drawLine(CoordinateType::Map, owner->getPosition().x, owner->getPosition().y, m_pos.x, m_pos.y, m_moveAttack ? Colors::Red : Colors::Green);
 
 	if(owner->isMoving())
 		return BH_RUNNING;
@@ -161,10 +159,12 @@ BH_STATUS CalculateFallbackPos::Update(float deltaTime)
 	if(units.empty())
 		return BH_FAILURE;
 
-	Position attackPos;
+	Position attackPos(0, 0);
+	/*
 	units = Broodwar->enemy()->getUnits();
 	if(units.empty())
 		return BH_FAILURE;
+		*/
 	for(Unitset::iterator unit = units.begin(); unit != units.end(); ++unit)
 	{
 		//if(unit->getPlayer() != owner->getPlayer())
@@ -174,8 +174,10 @@ BH_STATUS CalculateFallbackPos::Update(float deltaTime)
 	}
 	attackPos /= units.size();
 
+	Broodwar->drawCircle(CoordinateType::Map, attackPos.x, attackPos.y, 5.0f, Colors::Red, true);
 	Position dir = owner->getPosition() - attackPos;
-	dir /= 2;
+	dir /= 3;
+	Broodwar->drawLine(CoordinateType::Map, owner->getPosition().x, owner->getPosition().y, attackPos.x, attackPos.y, Colors::Yellow);
 	//dir *= (int)(TILE_SIZE * 2.0f / dir.getLength());
 	Position pos = owner->getPosition() + dir;
 	s_blackboard->SetPosition("moveto", pos);

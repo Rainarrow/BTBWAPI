@@ -86,7 +86,6 @@ public:
 	Decorator() : m_child(NULL) {}
 	virtual ~Decorator();
 	virtual void			AddChild(Behavior * child);
-	virtual bool			IsLeafNode() const { return true; }
 
 protected:
 	Behavior *				m_child;
@@ -106,6 +105,14 @@ private:
 	int						m_limit;
 	int						m_counter;
 };
+
+class Negate : public Decorator
+{
+public:
+
+	virtual BH_STATUS		Update(float deltaTime);
+};
+
 
 ////////////////////////////////////////////////////
 // Composites

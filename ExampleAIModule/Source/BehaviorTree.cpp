@@ -97,6 +97,19 @@ BH_STATUS Repeat::Update(float deltaTime)
 	return BH_INVALID;
 }
 
+BH_STATUS Negate::Update(float deltaTime)
+{
+	m_child->Tick(deltaTime);
+	if (m_child->GetStatus() == BH_RUNNING)
+		return BH_RUNNING;
+	if (m_child->GetStatus() == BH_FAILURE)
+		return BH_SUCCESS;
+	if (m_child->GetStatus() == BH_SUCCESS)
+		return BH_FAILURE;
+	if (m_child->GetStatus() == BH_INVALID)
+		return BH_INVALID;
+}
+
 ////////////////////////////////////////////////////
 // Composites
 ////////////////////////////////////////////////////

@@ -295,6 +295,9 @@ void ExampleAIModule::CreateUnitGroups()
 				.AddSequence()
 					.AddAction(new IsLowHp)
 					.AddAction(new IsBeingAttacked)
+					.AddDecorator(new Negate)
+						.AddAction(new IsReadyToAttack)
+					.End()
 					.AddSequence()
 						.AddAction(new CalculateFallbackPos)
 						.AddAction(new MoveTo)
@@ -303,10 +306,10 @@ void ExampleAIModule::CreateUnitGroups()
 				.AddSequence()
 					.AddAction((new FindTarget))
 					.AddAction(new Attack)
-				.End()
-				.AddSequence()
-					.AddAction(new Delay(2))
 				.End();
+				//.AddSequence()
+					//.AddAction(new Delay(2))
+				//.End();
 
 			// Own unit detected, create group
 			UnitGroup * group = new UnitGroup(UnitTypes::Enum::Protoss_Dragoon, 1, BT.GetTree(), m_blackboard);

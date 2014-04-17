@@ -77,6 +77,17 @@ BTBuilder& BTBuilder::End()
 	return *this;
 }
 
+BTBuilder& BTBuilder::AddDecorator(Decorator * dec)
+{
+	if(m_internalNodes.empty())
+		m_root->AddChild(dec);
+	else
+		m_internalNodes.top()->AddChild(dec);
+
+	m_internalNodes.push(dec);
+	return *this;
+}
+
 Behavior * BTBuilder::GetTree() const
 {
 	if(m_internalNodes.empty())
