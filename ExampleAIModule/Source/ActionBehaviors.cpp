@@ -12,8 +12,6 @@ void MoveTo::OnInitialize()
 	int attack = 0;
 	s_blackboard->GetInt("moveattack", attack);
 	m_moveAttack = attack != 0;
-
-	result = s_blackboard->GetPosition("moveto", m_pos);
 }
 
 BH_STATUS MoveTo::Update(float deltaTime)
