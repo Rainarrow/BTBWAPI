@@ -35,5 +35,14 @@ BH_STATUS IsReadyToAttack::Update(float deltaTime)
 	if(owner == NULL || !owner->exists())
 		return BH_FAILURE;
 
-	 return (owner->getAirWeaponCooldown() == 0 && owner->getGroundWeaponCooldown() == 0) ? BH_SUCCESS : BH_FAILURE;
+	if (owner->getAirWeaponCooldown() == 0 && owner->getGroundWeaponCooldown() == 0)
+	{
+		//Broodwar->sendText("CD");
+		return BH_SUCCESS;
+	}
+	else
+	{
+		//Broodwar->sendText("NCD");
+		return BH_FAILURE;
+	}
 }

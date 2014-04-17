@@ -50,6 +50,12 @@ public:
 	virtual BH_STATUS		Update(float deltaTime);
 };
 
+class CalculateRegroupPos : public Behavior
+{
+public:
+	virtual BH_STATUS		Update(float deltaTime);
+};
+
 // Melee - Zealots
 class CheckCriticalTarget : public Behavior
 {

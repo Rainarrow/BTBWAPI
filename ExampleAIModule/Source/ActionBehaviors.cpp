@@ -171,21 +171,63 @@ BH_STATUS FindTarget::Update(float deltaTime)
 	UnitGroup * group = s_blackboard->GetUnitGroup();
 	if(group == NULL || group->GetUnits().empty())
 		return BH_FAILURE;
-	Position center = group->CalcCenterPosition();
+	//Position center = group->CalcCenterPosition();
+
+	Unit owner = NULL;
+	s_blackboard->GetUnit("owner0", owner);
+	if (owner == NULL || !owner->exists())
+		return BH_FAILURE;
+
+	WeaponType wtype = owner->getType().groundWeapon();
+	//int radius = wtype.maxRange();
+	int radius = 6 * TILE_SIZE; // Dragoon weapon range
 
 	Unit target = NULL;
-	int bestScore = 500;
-	Unitset units = Broodwar->enemy()->getUnits();
+	//int bestScore = 500;
+
+	//Unitset units = Broodwar->enemy()->getUnits();
+	Unitset units = owner->getUnitsInRadius(radius, Filter::IsEnemy);
+	//Unitset units = owner->getUnitsInWeaponRange(wtype); // Causes crash!
+
+	if (units.empty()) // No enemy in range, scanning all map
+	{
+		units = Broodwar->enemy()->getUnits();
+		if (units.empty()) // Still no enemy, fail
+			return BH_FAILURE;
+		else // Enemy out of range, fine the closest one
+		{
+			target = *units.begin();
+			for (Unitset::iterator unit = units.begin(); unit != units.end(); ++unit) 
+			{
+				if (owner->getPosition().getApproxDistance(unit->getPosition()) < owner->getPosition().getApproxDistance(target->getPosition()));
+				target = *unit;
+			}
+		}
+
+	}
+	else //Enemy in range, find the lowest hp one
+	{
+		target = *units.begin();
+		for (Unitset::iterator unit = units.begin(); unit != units.end(); ++unit) // Enemy in range, find the one with lowest hp
+		{
+			if (target->getHitPoints() + target->getShields() > unit->getHitPoints() + unit->getShields())
+				target = *unit;
+		}
+	}
+
+
+	/*
 	for(Unitset::iterator unit = units.begin(); unit != units.end(); ++unit)
 	{
 		int score = unit->getHitPoints();
-		score -= center.getApproxDistance(unit->getPosition()) / TILE_SIZE;
+		score -= center.getApproxDistance(unit->getPosition());// / TILE_SIZE;
 		if(score < bestScore)
 		{
 			bestScore = score;
 			target = *unit;
 		}
 	}
+	*/
 	if(target)
 	{
 		s_blackboard->SetUnit("target", target);
@@ -214,8 +256,10 @@ BH_STATUS CalculateFallbackPos::Update(float deltaTime)
 		return BH_FAILURE;
 
 	WeaponType wtype = owner->getType().groundWeapon();
-	int radius = wtype.maxRange() * TILE_SIZE;
-	Unitset units = owner->getUnitsInRadius(radius);
+	//int radius = wtype.maxRange();// * TILE_SIZE;
+	int radius = 6 * TILE_SIZE; // Dragoon weapon range
+	Unitset units = owner->getUnitsInRadius(radius, Filter::IsEnemy);
+	//Unitset units = owner->getUnitsInWeaponRange(wtype);
 	if(units.empty())
 		return BH_FAILURE;
 
@@ -236,13 +280,15 @@ BH_STATUS CalculateFallbackPos::Update(float deltaTime)
 
 	Broodwar->drawCircle(CoordinateType::Map, attackPos.x, attackPos.y, 5.0f, Colors::Red, true);
 	Position dir = owner->getPosition() - attackPos;
-	dir /= 3;
+	dir /= 2;
 	Broodwar->drawLine(CoordinateType::Map, owner->getPosition().x, owner->getPosition().y, attackPos.x, attackPos.y, Colors::Yellow);
 	//dir *= (int)(TILE_SIZE * 2.0f / dir.getLength());
 	Position pos = owner->getPosition() + dir;
 	s_blackboard->SetPosition("moveto", pos);
+	Broodwar->sendText("FallingBack");
 	return BH_SUCCESS;
 }
+
 
 ////////////////////////////////////////////////////
 // CheckCriticalTarget

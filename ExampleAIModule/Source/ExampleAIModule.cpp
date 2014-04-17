@@ -85,6 +85,20 @@ void ExampleAIModule::onFrame()
 	for(auto it = m_unitGroups.begin(); it != m_unitGroups.end(); ++it)
 		(*it)->Update();
 
+	/////////////////////////////
+	// DEBUG DRAW HEALTH BAR
+	/////////////////////////////
+
+	Unitset myUnits = Broodwar->self()->getUnits();
+
+	const int hpBarLength = 10;
+	for (Unitset::iterator u = myUnits.begin(); u != myUnits.end(); ++u)
+	{
+		int totalHP = u->getHitPoints() + u->getShields();
+		int maxHP = u->getType().maxHitPoints() + u->getType().maxShields();
+		float ratio = totalHP / maxHP;
+		Broodwar->drawLine(CoordinateType::Map, u->getPosition().x - hpBarLength, u->getPosition().y, u->getPosition().x + (hpBarLength * ratio), u->getPosition().y, Colors::Green);
+	}
 	/*
 	// Iterate through all the units that we own
 	Unitset myUnits = Broodwar->self()->getUnits();
@@ -337,7 +351,7 @@ void ExampleAIModule::CreateUnitGroups()
 			.End();
 
 		// Own unit detected, create group
-		UnitGroup * group = new UnitGroup(UnitTypes::Enum::Protoss_Zealot, 8, BT.GetTree(), m_blackboard);
+		UnitGroup * group = new UnitGroup(UnitTypes::Enum::Protoss_Zealot, 3, BT.GetTree(), m_blackboard);
 		m_unitGroups.push_back(group);
 	}
 }
