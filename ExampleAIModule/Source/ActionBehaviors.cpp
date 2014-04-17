@@ -9,17 +9,11 @@
 
 void MoveTo::OnInitialize()
 {
-	Unit owner;
-	bool result = s_blackboard->GetUnit("owner0", owner);
-	assert(result);
-
 	int attack = 0;
 	s_blackboard->GetInt("moveattack", attack);
 	m_moveAttack = attack != 0;
 
 	result = s_blackboard->GetPosition("moveto", m_pos);
-	//assert(result);
-	//m_pos.y += 100;
 }
 
 BH_STATUS MoveTo::Update(float deltaTime)
@@ -28,21 +22,89 @@ BH_STATUS MoveTo::Update(float deltaTime)
 	if(!s_blackboard->GetUnit("owner0", owner))
 		return BH_FAILURE;
 
-	Broodwar->drawLine(CoordinateType::Map, owner->getPosition().x, owner->getPosition().y, m_pos.x, m_pos.y, m_moveAttack ? Colors::Red : Colors::Green);
+	Position movePos;
+	if(!s_blackboard->GetPosition("moveto", movePos))
+		return BH_FAILURE;
+
+	Broodwar->drawLine(CoordinateType::Map, owner->getPosition().x, owner->getPosition().y, movePos.x, movePos.y, m_moveAttack ? Colors::Red : Colors::White);
 
 	if(owner->isMoving())
 		return BH_RUNNING;
 
 	Position pos = owner->getPosition();
-	if(pos.getApproxDistance(m_pos) < 2.0f)
+	if(pos.getApproxDistance(movePos) < 2.0f)
 		return BH_SUCCESS;
 	if(GetStatus() == BH_RUNNING)
 		return BH_FAILURE;
 
 	if(!m_moveAttack)
-		owner->move(m_pos);
+		owner->move(movePos);
 	else
-		owner->attack(m_pos);
+		owner->attack(movePos);
+
+	return BH_RUNNING;
+}
+
+////////////////////////////////////////////////////
+// GroupMoveTo
+////////////////////////////////////////////////////
+
+void GroupMoveTo::OnInitialize()
+{
+	int attack = 0;
+	s_blackboard->GetInt("moveattack", attack);
+	m_moveAttack = attack != 0;
+}
+
+BH_STATUS GroupMoveTo::Update(float deltaTime)
+{
+	UnitGroup * group = s_blackboard->GetUnitGroup();
+	if(group == NULL || group->GetUnits().empty())
+		return BH_FAILURE;
+
+	bool moving = false;
+	int i = 0, moveDone = 0;
+	for(auto it = group->GetUnits().begin(); it != group->GetUnits().end(); ++it, ++i)
+	{
+		Unit unit = *it;
+		if(!unit->exists())
+			continue;
+
+		char name[10];
+		sprintf_s(name, 10, "moveto%d", i);
+		Position movePos;
+		if(!s_blackboard->GetPosition(name, movePos))
+			continue;
+
+		moving = true;
+
+		Broodwar->drawLine(CoordinateType::Map, unit->getPosition().x, unit->getPosition().y, movePos.x, movePos.y, m_moveAttack ? Colors::Red : Colors::White);
+
+		if(unit->isMoving())
+			continue;
+
+		Position pos = unit->getPosition();
+		if(pos.getApproxDistance(movePos) < 2.0f)
+		{
+			++moveDone;
+			continue;
+		}
+
+		if(GetStatus() == BH_RUNNING)
+		{
+			return BH_FAILURE;
+		}
+
+		if(!m_moveAttack)
+			unit->move(movePos);
+		else
+			unit->attack(movePos);
+	}
+
+	if(!moving)
+		return BH_FAILURE;
+	if(moveDone == group->GetUnits().size())
+		return BH_SUCCESS;
 
 	return BH_RUNNING;
 }
@@ -182,5 +244,97 @@ BH_STATUS CalculateFallbackPos::Update(float deltaTime)
 	Position pos = owner->getPosition() + dir;
 	s_blackboard->SetPosition("moveto", pos);
 	return BH_SUCCESS;
+}
+
+////////////////////////////////////////////////////
+// CheckCriticalTarget
+////////////////////////////////////////////////////
+
+BH_STATUS CheckCriticalTarget::Update(float deltaTime)
+{
+	Unit criticalTarget = NULL;
+	s_blackboard->GetUnit("criticaltarget", criticalTarget);
+	if(criticalTarget == NULL || !criticalTarget->exists())
+		return BH_FAILURE;
+
+	s_blackboard->SetUnit("target", criticalTarget);
+	return BH_SUCCESS;
+}
+
+////////////////////////////////////////////////////
+// FindGroupMoveToEnemy
+////////////////////////////////////////////////////
+
+BH_STATUS FindGroupMoveToEnemy::Update(float deltaTime)
+{
+	Position center;
+	Unitset units = Broodwar->enemy()->getUnits();
+	for(Unitset::iterator unit = units.begin(); unit != units.end(); ++unit)
+	{
+		center += unit->getPosition();
+	}
+	center /= Broodwar->enemy()->getUnits().size();
+
+	int groupSize = 0;
+	s_blackboard->GetInt("groupsize", groupSize);
+	if(groupSize == 0)
+		return BH_FAILURE;
+	for(int i = 0; i < groupSize; ++i)
+	{
+		char name[10];
+		sprintf_s(name, 10, "moveto%d", i);
+		s_blackboard->GetPosition(name, center);
+	}
+
+	return BH_SUCCESS;
+}
+
+////////////////////////////////////////////////////
+// FindCenterAttack
+////////////////////////////////////////////////////
+
+BH_STATUS FindCenterAttack::Update(float deltaTime)
+{
+	Position center;
+	Unitset units = Broodwar->enemy()->getUnits();
+	for(Unitset::iterator unit = units.begin(); unit != units.end(); ++unit)
+	{
+		center += unit->getPosition();
+	}
+	center /= Broodwar->enemy()->getUnits().size();
+
+	s_blackboard->SetInt("moveattack", 1);
+
+	int groupSize = 0;
+	s_blackboard->GetInt("groupsize", groupSize);
+	if(groupSize == 0)
+		return BH_FAILURE;
+	for(int i = 0; i < groupSize; ++i)
+	{
+		char name[10];
+		sprintf_s(name, 10, "moveto%d", i);
+		s_blackboard->GetPosition(name, center);
+	}
+
+	return BH_SUCCESS;
+}
+
+////////////////////////////////////////////////////
+// FindCriticalTarget
+////////////////////////////////////////////////////
+
+BH_STATUS FindCriticalTarget::Update(float deltaTime)
+{
+	Unitset units = Broodwar->enemy()->getUnits();
+	for(Unitset::iterator unit = units.begin(); unit != units.end(); ++unit)
+	{
+		if(unit->getType() == UnitTypes::Enum::Protoss_Reaver)
+		{
+			s_blackboard->GetUnit("criticaltarget", *unit);
+			return BH_SUCCESS;
+		}
+	}
+
+	return BH_FAILURE;
 }
 

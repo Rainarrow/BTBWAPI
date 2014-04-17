@@ -57,7 +57,7 @@ void ExampleAIModule::onEnd(bool isWinner)
 		// Log your win here!
 	}
 	SafeDelete(m_blackboard);
-
+	SafeDelete(m_tacticalBehavior);
 	for(auto it = m_unitGroups.begin(); it != m_unitGroups.end(); ++it)
 		SafeDelete(*it);
 	m_unitGroups.clear();
@@ -79,10 +79,13 @@ void ExampleAIModule::onFrame()
 	if ( Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0 )
 		return;
 
+	s_blackboard = m_blackboard;
+	m_tacticalBehavior->Tick(0.067f);
+
 	for(auto it = m_unitGroups.begin(); it != m_unitGroups.end(); ++it)
 		(*it)->Update();
-	return;
 
+	/*
 	// Iterate through all the units that we own
 	Unitset myUnits = Broodwar->self()->getUnits();
 	for ( Unitset::iterator u = myUnits.begin(); u != myUnits.end(); ++u )
@@ -209,6 +212,7 @@ void ExampleAIModule::onFrame()
 			} // closure: failed to train idle unit
 		}
 	} // closure: unit iterator
+	*/
 }
 
 void ExampleAIModule::onSendText(std::string text)
@@ -216,7 +220,6 @@ void ExampleAIModule::onSendText(std::string text)
 
 	// Send the text to the game if it is not being processed.
 	Broodwar->sendText("%s", text.c_str());
-
 
 	// Make sure to use %s and pass the text as a parameter,
 	// otherwise you may run into problems when you use the %(percent) character!
@@ -276,18 +279,18 @@ void ExampleAIModule::onUnitHide(BWAPI::Unit unit)
 void ExampleAIModule::CreateUnitGroups()
 {
 	{
-		/*
-		BTBuilder().
-			AddSequence()
-				.AddAction(new MoveTo())
-				.AddAction(new Delay())
-				.AddSequence()
-					.AddAction(new Delay())
-				.End()
+		BTBuilder BT(new Selector);
+		BT
+			.AddSequence()
+				.AddAction(new FindCriticalTarget)
+				.AddAction(new Delay(2))
 			.End()
-		.End();
-		*/
+			.AddAction(new Delay(2));
 
+		m_tacticalBehavior = BT.GetTree();
+	}
+
+	{
 		for(int i = 0; i < 8; ++i)
 		{
 			BTBuilder BT(new ActiveSelector);
@@ -315,6 +318,27 @@ void ExampleAIModule::CreateUnitGroups()
 			UnitGroup * group = new UnitGroup(UnitTypes::Enum::Protoss_Dragoon, 1, BT.GetTree(), m_blackboard);
 			m_unitGroups.push_back(group);
 		}
+	}
+	{
+		BTBuilder BT(new ActiveSelector);
+		BT
+			.AddSequence()
+				.AddAction(new CheckCriticalTarget)
+				.AddAction(new Attack)
+			.End()
+			.AddSequence()
+				.AddAction((new FindGroupMoveToEnemy))
+				.AddAction(new GroupMoveTo)
+				.AddAction(new FindCenterAttack)
+				.AddAction(new GroupMoveTo)
+			.End()
+			.AddSequence()
+				.AddAction(new Delay(2))
+			.End();
+
+		// Own unit detected, create group
+		UnitGroup * group = new UnitGroup(UnitTypes::Enum::Protoss_Zealot, 8, BT.GetTree(), m_blackboard);
+		m_unitGroups.push_back(group);
 	}
 }
 
