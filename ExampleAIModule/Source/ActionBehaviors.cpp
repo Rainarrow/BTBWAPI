@@ -388,12 +388,18 @@ BH_STATUS FindGroupTarget::Update(float deltaTime)
 	UnitGroup * group = s_blackboard->GetUnitGroup();
 	if(group == NULL || group->GetUnits().empty())
 		return BH_FAILURE;
+	Position center = group->CalcCenterPosition();
 
 	list<Unit> units = group->GetUnits();
-	Unitset enemies = Broodwar->enemy()->getUnits();
+	//Unitset enemies = Broodwar->enemy()->getUnits();
+	Unitset enemies = Broodwar->getUnitsInRadius(center, 4.0f * TILE_SIZE, Filter::IsEnemy && Filter::GetType == UnitTypes::Enum::Protoss_Zealot);
+	if(enemies.empty())
+		enemies = Broodwar->enemy()->getUnits();
+
 	if(enemies.empty())
 		return BH_FAILURE;
 	int i = 0;
+
 	auto it = units.begin();
 	for(Unitset::iterator enemy = enemies.begin(); enemy != enemies.end(); ++enemy)
 	{
