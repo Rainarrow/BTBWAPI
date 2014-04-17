@@ -11,8 +11,9 @@
 using namespace BWAPI;
 using namespace Filter;
 
-void ExampleAIModule::onStart()
+void CS580::onStart()
 {
+	Broodwar << "CS580 Research Project"<< std::endl;
 	// Enable the UserInput flag, which allows us to control the bot and type messages.
 	Broodwar->enableFlag(Flag::UserInput);
 
@@ -49,7 +50,7 @@ void ExampleAIModule::onStart()
 	CreateUnitGroups();
 }
 
-void ExampleAIModule::onEnd(bool isWinner)
+void CS580::onEnd(bool isWinner)
 {
 	// Called when the game ends
 	if ( isWinner )
@@ -63,7 +64,7 @@ void ExampleAIModule::onEnd(bool isWinner)
 	m_unitGroups.clear();
 }
 
-void ExampleAIModule::onFrame()
+void CS580::onFrame()
 {
 	// Called once every game frame
 
@@ -229,7 +230,7 @@ void ExampleAIModule::onFrame()
 	*/
 }
 
-void ExampleAIModule::onSendText(std::string text)
+void CS580::onSendText(std::string text)
 {
 
 	// Send the text to the game if it is not being processed.
@@ -239,20 +240,20 @@ void ExampleAIModule::onSendText(std::string text)
 	// otherwise you may run into problems when you use the %(percent) character!
 }
 
-void ExampleAIModule::onReceiveText(BWAPI::Player player, std::string text)
+void CS580::onReceiveText(BWAPI::Player player, std::string text)
 {
 	// Parse the received text
 	Broodwar << player->getName() << " said \"" << text << "\"" << std::endl;
 }
 
-void ExampleAIModule::onPlayerLeft(BWAPI::Player player)
+void CS580::onPlayerLeft(BWAPI::Player player)
 {
 	// Interact verbally with the other players in the game by
 	// announcing that the other player has left.
 	Broodwar->sendText("Goodbye %s!", player->getName().c_str());
 }
 
-void ExampleAIModule::onNukeDetect(BWAPI::Position target)
+void CS580::onNukeDetect(BWAPI::Position target)
 {
 
 	// Check if the target is a valid position
@@ -270,27 +271,27 @@ void ExampleAIModule::onNukeDetect(BWAPI::Position target)
 	// You can also retrieve all the nuclear missile targets using Broodwar->getNukeDots()!
 }
 
-void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit)
+void CS580::onUnitDiscover(BWAPI::Unit unit)
 {
 	//Broodwar->sendText("onUnitDiscover %s!", unit->getType().getName().c_str());
 }
 
-void ExampleAIModule::onUnitEvade(BWAPI::Unit unit)
+void CS580::onUnitEvade(BWAPI::Unit unit)
 {
 	//Broodwar->sendText("onUnitEvade %s!", unit->getType().getName().c_str());
 }
 
-void ExampleAIModule::onUnitShow(BWAPI::Unit unit)
+void CS580::onUnitShow(BWAPI::Unit unit)
 {
 	//Broodwar->sendText("onUnitShow %s!", unit->getType().getName().c_str());
 }
 
-void ExampleAIModule::onUnitHide(BWAPI::Unit unit)
+void CS580::onUnitHide(BWAPI::Unit unit)
 {
 	//Broodwar->sendText("onUnitHide %s!", unit->getType().getName().c_str());
 }
 
-void ExampleAIModule::CreateUnitGroups()
+void CS580::CreateUnitGroups()
 {
 	{
 		BTBuilder BT(new Selector);
@@ -356,7 +357,7 @@ void ExampleAIModule::CreateUnitGroups()
 	}
 }
 
-void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
+void CS580::onUnitCreate(BWAPI::Unit unit)
 {
 	//Broodwar->sendText("onUnitCreate %s!", unit->getType().getName().c_str());
 	if(unit->getPlayer() == Broodwar->self())
@@ -391,7 +392,7 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
 	*/
 }
 
-void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit)
+void CS580::onUnitDestroy(BWAPI::Unit unit)
 {
 	for(auto it = m_unitGroups.begin(); it != m_unitGroups.end(); ++it)
 	{
@@ -399,7 +400,7 @@ void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit)
 	}
 }
 
-void ExampleAIModule::onUnitMorph(BWAPI::Unit unit)
+void CS580::onUnitMorph(BWAPI::Unit unit)
 {
 	if ( Broodwar->isReplay() )
 	{
@@ -414,15 +415,15 @@ void ExampleAIModule::onUnitMorph(BWAPI::Unit unit)
 	}
 }
 
-void ExampleAIModule::onUnitRenegade(BWAPI::Unit unit)
+void CS580::onUnitRenegade(BWAPI::Unit unit)
 {
 }
 
-void ExampleAIModule::onSaveGame(std::string gameName)
+void CS580::onSaveGame(std::string gameName)
 {
 	Broodwar << "The game was saved to \"" << gameName << "\"" << std::endl;
 }
 
-void ExampleAIModule::onUnitComplete(BWAPI::Unit unit)
+void CS580::onUnitComplete(BWAPI::Unit unit)
 {
 }

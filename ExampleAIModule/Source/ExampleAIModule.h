@@ -8,7 +8,7 @@ using namespace std;
 class Behavior;
 class Blackboard;
 class UnitGroup;
-class ExampleAIModule : public BWAPI::AIModule
+class CS580 : public BWAPI::AIModule
 {
 public:
   // Virtual functions for callbacks, leave these as they are.
